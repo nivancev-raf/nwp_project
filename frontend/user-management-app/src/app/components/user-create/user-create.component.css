@@ -1,0 +1,11 @@
+.permission-checkboxes {
+    margin-top: 10px;
+  }
+  
+  .form-check {
+    margin-bottom: 8px;
+  }
+  
+  .invalid-feedback {
+    display: block;
+  }

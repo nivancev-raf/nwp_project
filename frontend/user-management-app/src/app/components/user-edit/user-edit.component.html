@@ -1,0 +1,52 @@
+<!-- user-edit.component.html -->
+<div class="container mt-4">
+    <h2>Edit User</h2>
+  
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="mt-4">
+      <div class="mb-3">
+        <label for="firstName" class="form-label">First Name</label>
+        <input type="text" class="form-control" id="firstName" formControlName="firstName">
+      </div>
+  
+      <div class="mb-3">
+        <label for="lastName" class="form-label">Last Name</label>
+        <input type="text" class="form-control" id="lastName" formControlName="lastName">
+      </div>
+  
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" formControlName="email">
+        <div *ngIf="userForm.get('email')?.errors?.['email'] && userForm.get('email')?.touched" 
+             class="text-danger">
+          Please enter a valid email format
+        </div>
+      </div>
+  
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="text" 
+               class="form-control" 
+               id="password" 
+               formControlName="password"
+               placeholder="Enter new password (leave empty to keep current)">
+      </div>
+  
+      <div class="mb-3">
+        <label class="form-label">Permissions</label>
+        <div class="form-check" *ngFor="let permission of availablePermissions">
+          <input class="form-check-input" 
+                 type="checkbox" 
+                 [id]="permission"
+                 [value]="permission"
+                 [checked]="userForm.get('permissions')?.value?.includes(permission)"
+                 (change)="onPermissionChange($event, permission)">
+          <label class="form-check-label" [for]="permission">
+            {{ permission }}
+          </label>
+        </div>
+      </div>
+  
+      <button type="submit" class="btn btn-primary" [disabled]="!userForm.valid">Save Changes</button>
+      <button type="button" class="btn btn-secondary ms-2" routerLink="/users">Cancel</button>
+    </form>
+  </div>
