@@ -50,5 +50,17 @@ export const routes: Routes = [
     loadComponent: () => import('./components/user-edit/user-edit.component').then(m => m.UserEditComponent),
     canActivate: [PermissionGuard],
     data: { requiredPermission: 'can_update_users' }
+  },
+  {
+    path: 'orders',
+    loadComponent: () => import('./components/order-list/order-list.component').then(m => m.OrderListComponent),
+    canActivate: [PermissionGuard],
+    data: { requiredPermission: 'can_search_order' }
+  },
+  {
+    path: 'orders/create',
+    loadComponent: () => import('./components/order-create/order-create.component').then(m => m.OrderCreateComponent),
+    canActivate: [PermissionGuard],
+    data: { requiredPermission: 'can_place_order' }
   }
 ];

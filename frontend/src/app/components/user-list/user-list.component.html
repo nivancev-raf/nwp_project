@@ -31,9 +31,18 @@
             <span *ngIf="!userPermissions.includes('can_update_users')">{{ user.email }}</span> 
           </td>
           <td>
-            <span *ngFor="let permission of user.permissions" class="badge bg-primary me-1">
+            <!-- <span *ngFor="let permission of user.permissions" class="badge bg-primary me-1">
               {{ permission }}
-            </span>
+            </span> -->
+              <span *ngFor="let permission of getDisplayedPermissions(user.permissions); let i = index" class="badge bg-primary me-1">
+                {{ permission }}
+              </span>
+              
+              <div *ngIf="user.permissions.length > 5">
+                <span *ngFor="let permission of getOverflowPermissions(user.permissions)" class="badge bg-primary me-1">
+                  {{ permission }}
+                </span>
+              </div>
           </td>
           <td>
             <button 

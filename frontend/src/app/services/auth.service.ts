@@ -10,6 +10,7 @@ import { LoginResponse } from '../models/login-response';
 export class AuthService {
   private readonly API_URL = 'http://localhost:8080';
   private currentUserId: number | null = null;
+  private userPermissionCount: number = 0;
 
   private isLoggedInSubject = new BehaviorSubject<boolean>(this.tokenExists());
   isLoggedIn$ = this.isLoggedInSubject.asObservable(); // $ at the end of the variable name is a convention for observables
@@ -110,6 +111,7 @@ export class AuthService {
       }
 
       if (response && response.permissions) {
+        this.userPermissionCount = response.permissions.length;
         this.userPermissionsSubject.next(response.permissions);
       }
   
@@ -123,6 +125,16 @@ export class AuthService {
   setCurrentUserId(id: number) {
     this.currentUserId = id;
     localStorage.setItem('userId', id.toString());
+  }
+
+  async isAdmin(): Promise<boolean> {
+    await this.getCurrentUser();
+    // if user has 9 permissions, he is an admin
+    if (this.userPermissionsSubject.value.length === 9) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   getCurrentUserId(): number | null {

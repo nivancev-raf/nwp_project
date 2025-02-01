@@ -17,6 +17,12 @@
           <li class="nav-item" *ngIf="userPermissions.includes('can_create_users')">
             <a class="nav-link" routerLink="/users/create" routerLinkActive="active">New User</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/orders" routerLinkActive="active">Order List</a>
+          </li>
+          <li class="nav-item" *ngIf="userPermissions.includes('can_place_order')">
+            <a class="nav-link" routerLink="/orders/create" routerLinkActive="active">Create Order</a>
+          </li>
         </ng-container>
       </ul>
 

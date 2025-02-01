@@ -1,0 +1,140 @@
+package rs.raf.backend.services;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import rs.raf.backend.model.*;
+import rs.raf.backend.repository.DishRepository;
+import rs.raf.backend.repository.ErrorMessageRepository;
+import rs.raf.backend.repository.OrderRepository;
+import rs.raf.backend.repository.UserRepository;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+//@Transactional
+public class OrderService {
+    private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
+    private final DishRepository dishRepository;
+    private final ErrorMessageRepository errorMessageRepository;
+
+    private final UserService userService;
+
+    public OrderService(OrderRepository orderRepository,
+                        UserRepository userRepository,
+                        DishRepository dishRepository,
+                        UserService userService,
+                        ErrorMessageRepository errorMessageRepository) {
+        this.orderRepository = orderRepository;
+        this.userRepository = userRepository;
+        this.dishRepository = dishRepository;
+        this.userService = userService;
+        this.errorMessageRepository = errorMessageRepository;
+    }
+
+    public List<Order> search(List<String> statuses, LocalDateTime dateFrom,
+                              LocalDateTime dateTo, Long userId, User currentUser) {
+
+        // ako je user obican, vrati sve njegove porudzbine
+        if (!currentUser.getRole().equals(UserTypes.ADMIN)) {
+            return orderRepository.findByCreatedBy(currentUser);
+        }
+
+        // ako je user admin, vrati porudzbine prema parametrima
+        if (statuses != null && !statuses.isEmpty()) {
+            List<OrderStatus> orderStatuses = statuses.stream()
+                    .map(OrderStatus::valueOf)
+                    .collect(Collectors.toList());
+
+            if (dateFrom != null && dateTo != null) {
+                if (userId != null) {
+                    // ima sve parametre
+                    return orderRepository.findByStatusInAndCreatedAtBetweenAndCreatedById(
+                            orderStatuses, dateFrom, dateTo, userId);
+                }
+                // ima statuse i datume ali nema usera
+                return orderRepository.findByStatusInAndCreatedAtBetween(orderStatuses, dateFrom, dateTo);
+            }
+
+            if (userId != null) {
+                // ima statuse i usera ali nema datuma
+                return orderRepository.findByStatusInAndCreatedById(orderStatuses, userId);
+            }
+
+            // ima statuse ali nema datuma i usera
+            return orderRepository.findByStatusIn(orderStatuses);
+        }
+
+        if (dateFrom != null && dateTo != null) {
+            if (userId != null) {
+                // ima datume i usera ali nema statuse
+                return orderRepository.findByCreatedAtBetweenAndCreatedById(dateFrom, dateTo, userId);
+            }
+            // ima datume ali nema statuse i usera
+            return orderRepository.findByCreatedAtBetween(dateFrom, dateTo);
+        }
+
+        if (userId != null) {
+            // ima usera ali nema statuse i datume
+            return orderRepository.findByCreatedById(userId);
+        }
+
+        // nema parametara
+        return orderRepository.findAll();
+    }
+
+    public Order placeOrder(CreateOrderRequest req) {
+        // TODO: Implementirati kreiranje porudžbine
+
+        // provera broja aktivnih porudžbina u pripremi/dostavi
+        int activeOrdersCount = orderRepository.countByStatusInAndActiveTrue(List.of(OrderStatus.PREPARING, OrderStatus.IN_DELIVERY));
+
+        if (activeOrdersCount >= 3) {
+            ErrorMessage errorMessage = new ErrorMessage();
+            errorMessage.setDate(LocalDateTime.now());
+            errorMessage.setOperation("PLACE_ORDER");
+            errorMessage.setMessage("Maximum number of concurrent orders (3) reached");
+            errorMessageRepository.save(errorMessage);
+        }
+
+        Order order = new Order();
+        order.setStatus(OrderStatus.ORDERED);
+        order.setActive(true);
+        order.setCreatedAt(LocalDateTime.now());
+        System.out.println("Stigao sam do ovde");
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println("USER EMAIL:" + userEmail);
+        order.setCreatedBy(userService.findByEmail(userEmail));
+        order.setDishes(dishRepository.findAllById(req.getDishes()));
+
+
+
+        return orderRepository.save(order);
+    }
+
+    public void cancelOrder(Long orderId) {
+
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        if (order.getStatus() != OrderStatus.ORDERED) {
+            throw new IllegalStateException("Only orders in ORDERED status can be canceled");
+        }
+
+        order.setStatus(OrderStatus.CANCELED);
+        order.setActive(false);
+        orderRepository.save(order);
+    }
+
+    public OrderStatus trackOrder(Long orderId) {
+        // TODO: Implementirati praćenje porudžbine
+        return null;
+    }
+
+    public Order scheduleOrder(Long userId, List<Long> dishIds, LocalDateTime scheduledTime) {
+        // TODO: Implementirati zakazivanje porudžbine
+        return null;
+    }
+}

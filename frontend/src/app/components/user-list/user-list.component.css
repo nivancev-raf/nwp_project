@@ -2,7 +2,13 @@
     font-size: 0.8em;
     padding: 5px 8px;
     margin-right: 4px;
+    display: inline-block;
   }
+ 
+  /* Add spacing between permission rows */
+td > div {
+  margin-top: 6px;
+}
   
   table {
     margin-top: 20px;

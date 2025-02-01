@@ -7,7 +7,10 @@ public class CreateUserRequest {
     private String lastName;
     private String email;
     private String password;
+    private String role;
     private Set<String> permissions;
+
+
     public CreateUserRequest() {
     }
 
@@ -49,6 +52,14 @@ public class CreateUserRequest {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public Set<String> getPermissions() {

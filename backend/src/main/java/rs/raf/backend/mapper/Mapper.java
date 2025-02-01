@@ -11,6 +11,7 @@ public class Mapper {
                 request.getFirstName(),
                 request.getLastName(),
                 request.getEmail(),
+                request.getRole(),
                 passwordEncoder.encode(request.getPassword()),
                 request.getPermissions()
         );

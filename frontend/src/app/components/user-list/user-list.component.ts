@@ -58,4 +58,12 @@ export class UserListComponent implements OnInit {
       console.error('Error deleting user:', error);
     }
   }
+
+  getDisplayedPermissions(permissions: string[]): string[] {
+    return permissions.slice(0, 5);
+  }
+  
+  getOverflowPermissions(permissions: string[]): string[] {
+    return permissions.length > 5 ? permissions.slice(5) : [];
+  }
 }

@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import rs.raf.backend.model.User;
+import rs.raf.backend.model.UserTypes;
 import rs.raf.backend.repository.UserRepository;
 import rs.raf.backend.requests.CreateUserRequest;
 import rs.raf.backend.utils.UserAlreadyExistsException;
@@ -74,6 +75,15 @@ public class UserService implements UserDetailsService {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new UserAlreadyExistsException("User with email " + user.getEmail() + " already exists");
         }
+
+        // if user has all permissions, set role to admin, else set role to user
+        // namesteno je da je korisnik admin ukoliko ima sve permisije
+        if (user.getPermissions().size() == 9) {
+            user.setRole(String.valueOf(UserTypes.ADMIN));
+        } else {
+            user.setRole(String.valueOf(UserTypes.USER));
+        }
+
         return userRepository.save(CreateUserRequestToUser(user, passwordEncoder));
     }
 
