@@ -88,32 +88,32 @@ public class OrderService {
     }
 
     public Order placeOrder(CreateOrderRequest req) {
-        // TODO: Implementirati kreiranje porudžbine
 
-        // provera broja aktivnih porudžbina u pripremi/dostavi
+        // provera broja aktivnih porudžbina u pripremi/dostavi (stanja PREPARING i IN_DELIVERY)
         int activeOrdersCount = orderRepository.countByStatusInAndActiveTrue(List.of(OrderStatus.PREPARING, OrderStatus.IN_DELIVERY));
-
-        if (activeOrdersCount >= 3) {
-            ErrorMessage errorMessage = new ErrorMessage();
-            errorMessage.setDate(LocalDateTime.now());
-            errorMessage.setOperation("PLACE_ORDER");
-            errorMessage.setMessage("Maximum number of concurrent orders (3) reached");
-            errorMessageRepository.save(errorMessage);
-        }
 
         Order order = new Order();
         order.setStatus(OrderStatus.ORDERED);
         order.setActive(true);
         order.setCreatedAt(LocalDateTime.now());
-        System.out.println("Stigao sam do ovde");
         String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         System.out.println("USER EMAIL:" + userEmail);
         order.setCreatedBy(userService.findByEmail(userEmail));
         order.setDishes(dishRepository.findAllById(req.getDishes()));
 
+        Order createdOrder = orderRepository.save(order);
 
+        if (activeOrdersCount >= 3) {
+            System.out.println("pravim error message");
+            ErrorMessage errorMessage = new ErrorMessage();
+            errorMessage.setDate(LocalDateTime.now());
+            errorMessage.setOrder(createdOrder);
+            errorMessage.setOperation("PLACE_ORDER");
+            errorMessage.setMessage("Maximum number of concurrent orders (3) reached");
+            errorMessageRepository.save(errorMessage);
+        }
 
-        return orderRepository.save(order);
+        return createdOrder;
     }
 
     public void cancelOrder(Long orderId) {
@@ -128,9 +128,8 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    public OrderStatus trackOrder(Long orderId) {
-        // TODO: Implementirati praćenje porudžbine
-        return null;
+    public Order trackOrder(Long id) {
+        return orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
     }
 
     public Order scheduleOrder(Long userId, List<Long> dishIds, LocalDateTime scheduledTime) {

@@ -22,9 +22,8 @@ public class OrderProcessingService {
         this.orderRepository = orderRepository;
     }
 
-//    @Scheduled(fixedDelay = 1000) // Proverava na svaku sekundu
+    @Scheduled(fixedDelay = 1000) // Proverava na svaku sekundu
     public void processOrders() {
-        // TODO: Implementirati automatsku promenu statusa porudžbina
         processOrderedToPreparingTransition();
         processPreparingToInDeliveryTransition();
         processInDeliveryToDeliveredTransition();

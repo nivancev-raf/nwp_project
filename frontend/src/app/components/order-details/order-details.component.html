@@ -1,0 +1,50 @@
+<!-- order-details.component.html -->
+<div class="container mt-4">
+    <div class="card" *ngIf="order">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h3>Order #{{order.id}}</h3>
+        <button class="btn btn-secondary" routerLink="/orders">Back to Orders</button>
+      </div>
+      
+      <div class="card-body">
+        <div class="row mb-4">
+          <div class="col">
+            <h5>Status: {{order.status}}</h5>
+            <p>Created at: {{order.createdAt | date:'medium'}}</p>
+            <p>Last updated: {{order.lastStatusChange | date:'medium'}}</p>
+          </div>
+        </div>
+  
+        <div class="row mb-4">
+          <div class="col">
+            <h5>Status Timeline</h5>
+            <div class="progress-track">
+              <div class="step" [class.active]="order.status === 'ORDERED' || isStatusPassed('ORDERED')">
+                <span>Ordered</span>
+              </div>
+              <div class="step" [class.active]="order.status === 'PREPARING' || isStatusPassed('PREPARING')">
+                <span>Preparing</span>
+              </div>
+              <div class="step" [class.active]="order.status === 'IN_DELIVERY' || isStatusPassed('IN_DELIVERY')">
+                <span>In Delivery</span>
+              </div>
+              <div class="step" [class.active]="order.status === 'DELIVERED'">
+                <span>Delivered</span>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="row">
+          <div class="col">
+            <h5>Order Items</h5>
+            <ul class="list-group">
+              <li class="list-group-item" *ngFor="let dish of order.dishes">
+                {{dish.name}} - ${{dish.price}}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -1,0 +1,41 @@
+/* order-details.component.css */
+.progress-track {
+    display: flex;
+    justify-content: space-between;
+    margin: 40px 0;
+    position: relative;
+  }
+  
+  .progress-track::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #ddd;
+  }
+  
+  .step {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .step.active {
+    border-color: #0d6efd;
+    background: #0d6efd;
+    color: white;
+  }
+  
+  .step span {
+    position: absolute;
+    top: 40px;
+    white-space: nowrap;
+  }

@@ -134,4 +134,23 @@ export class OrderService {
       return [];
     }
   }
+
+  // order.service.ts
+async trackOrder(id: number): Promise<Order> {
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${this.authService.getToken()}`
+  });
+
+  try {
+    const response = await this.http.get<Order>(
+      `${this.API_URL}/api/orders/track/${id}`,
+      { headers }
+    ).toPromise();
+    
+    return response!;
+  } catch (error) {
+    console.error('Error tracking order:', error);
+    throw error;
+  }
+}
 }

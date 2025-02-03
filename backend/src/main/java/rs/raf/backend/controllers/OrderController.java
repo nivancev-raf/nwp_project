@@ -78,8 +78,14 @@ public class OrderController {
 //            String username = SecurityContextHolder.getContext().getAuthentication().getName();
             return orderService.placeOrder(order);
         } catch (Exception e) {
-            throw new ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, e.getMessage());
+            throw new ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "Error while placing order, look 'Error message' table for more information");
         }
+    }
+
+    @PreAuthorize("hasAuthority('can_track_order')")
+    @GetMapping("/track/{id}")
+    public Order trackOrder(@PathVariable Long id) {
+        return orderService.trackOrder(id);
     }
 
     @PreAuthorize("hasAuthority('can_cancel_order')")

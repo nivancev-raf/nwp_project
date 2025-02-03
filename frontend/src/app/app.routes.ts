@@ -62,5 +62,15 @@ export const routes: Routes = [
     loadComponent: () => import('./components/order-create/order-create.component').then(m => m.OrderCreateComponent),
     canActivate: [PermissionGuard],
     data: { requiredPermission: 'can_place_order' }
+  },
+  {
+    path: 'orders/:id',
+    loadComponent: () => import('./components/order-details/order-details.component').then(m => m.OrderDetailsComponent),
+    canActivate: [PermissionGuard],
+    data: { requiredPermission: 'can_track_order' }
+  },
+  {
+    path: 'errors',
+    loadComponent: () => import('./components/error-history/error-history.component').then(m => m.ErrorHistoryComponent),
   }
 ];

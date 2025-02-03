@@ -27,6 +27,7 @@ public class ErrorMessage {
 
     @ManyToOne // Many error messages can be related to one order
     @JoinColumn(name = "order_id", nullable = false) // order_id je naziv polja u ErrorMessage klasi
+    @JsonIgnore // this means that the order field will not be serialized
     private Order order;
 
 

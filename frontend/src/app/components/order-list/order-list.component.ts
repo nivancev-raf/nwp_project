@@ -4,13 +4,14 @@ import { Order } from '../../models/order';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 
 @Component({
   selector: 'app-order-list',
   templateUrl: './order-list.component.html',
   styleUrl: './order-list.component.css',
-  imports: [CommonModule, FormsModule] 
+  imports: [CommonModule, FormsModule, RouterModule] 
 })
 export class OrderListComponent implements OnInit {
   orders: Order[] = [];
@@ -22,6 +23,7 @@ export class OrderListComponent implements OnInit {
   };
   isAdmin = false;
   userPermissions: string[] = [];
+  private pollingInterval: any; // za čuvanje reference na interval
  
   constructor(
     private orderService: OrderService,
@@ -32,6 +34,18 @@ export class OrderListComponent implements OnInit {
     await this.loadOrders();
     const userId = localStorage.getItem('userId');
     this.userPermissions = await this.authService.getUserPermissions(Number(userId));
+
+    // Započni polling svakih 5 sekundi
+    this.pollingInterval = setInterval(() => {
+      this.loadOrders();
+    }, 5000);
+  }
+
+  ngOnDestroy() {
+    // Očisti interval kada se komponenta uništi, komponenta se uništava kada se prebaci na drugu stranicu
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+    }
   }
  
   async loadOrders() {

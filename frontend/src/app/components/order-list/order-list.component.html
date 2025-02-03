@@ -61,15 +61,19 @@
               <li *ngFor="let item of order.dishes">{{item.name}} - ${{item.price}}</li>
             </ul>
           </td>
-          <td>{{order.createdBy}}</td>
+          <td>{{order.createdBy.firstName}}</td>
           <td>
-            <button class="btn btn-danger btn-sm" 
+            <button class="btn btn-danger btn-sm button-spacing" 
                     *ngIf="order.status === 'ORDERED'"
                     [disabled]="!hasPermission('can_cancel_order')"
                     (click)="cancelOrder(order.id)">
               Cancel
             </button>
-            <span *ngIf="order.status === 'CANCELED'">Canceled</span>
+            <span *ngIf="order.status === 'CANCELED'" class="button-spacing">Canceled</span>
+            <button class="btn btn-primary btn-sm button-spacing" [routerLink]="['/orders', order.id]"
+                [disabled]="!hasPermission('can_track_order')">
+                Track
+            </button>
           </td>
         </tr>
       </tbody>
