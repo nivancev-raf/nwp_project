@@ -72,5 +72,11 @@ export const routes: Routes = [
   {
     path: 'errors',
     loadComponent: () => import('./components/error-history/error-history.component').then(m => m.ErrorHistoryComponent),
+  },
+  {
+    path: 'schedule',
+    loadComponent: () => import('./components/order-schedule/order-schedule.component').then(m => m.OrderScheduleComponent),
+    canActivate: [PermissionGuard],
+    data: { requiredPermission: 'can_schedule_order' }
   }
 ];

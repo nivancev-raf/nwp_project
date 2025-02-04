@@ -23,6 +23,9 @@
           <li class="nav-item" *ngIf="userPermissions.includes('can_place_order')">
             <a class="nav-link" routerLink="/orders/create" routerLinkActive="active">Create Order</a>
           </li>
+          <li class="nav-item" *ngIf="userPermissions.includes('can_schedule_order')">
+            <a class="nav-link" routerLink="/schedule" routerLinkActive="active">Schedule Order</a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" routerLink="/errors" routerLinkActive="active">Error History</a>
           </li>

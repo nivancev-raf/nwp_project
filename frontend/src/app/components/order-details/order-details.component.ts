@@ -46,6 +46,9 @@ export class OrderDetailsComponent implements OnInit {
   }
 
   async loadOrderDetails() {
+    // if (this.orderId === NaN){
+
+    // }
     try {
       this.order = await this.orderService.trackOrder(this.orderId);
     } catch (error) {

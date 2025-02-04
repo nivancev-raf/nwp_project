@@ -1,5 +1,6 @@
 package rs.raf.backend.services;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import rs.raf.backend.model.*;
@@ -11,6 +12,7 @@ import rs.raf.backend.repository.UserRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -132,8 +134,75 @@ public class OrderService {
         return orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
     }
 
-    public Order scheduleOrder(Long userId, List<Long> dishIds, LocalDateTime scheduledTime) {
+    public Order scheduleOrder(CreateOrderRequest request, User user) {
         // TODO: Implementirati zakazivanje porudžbine
-        return null;
+        Order order = new Order();
+        order.setCreatedBy(user);
+        order.setDishes(dishRepository.findAllById(request.getDishes()));
+        order.setScheduledTime(request.getScheduledTime());
+        System.out.println("Scheduled time: " + request.getScheduledTime());
+        order.setCreatedAt(LocalDateTime.now());
+        order.setActive(true);
+        order.setStatus(OrderStatus.SCHEDULED);
+
+
+        return orderRepository.save(order);
+    }
+
+    @Scheduled(fixedDelay = 3000)
+    public void processScheduledOrders() {
+
+        // fetches all orders that are scheduled for now or before now, status is null (not ordered)
+        LocalDateTime nowMinusOneHour = LocalDateTime.now().minusHours(1);
+        System.out.println("Now minus one hour: " + nowMinusOneHour);
+        List<Order> scheduledOrders = orderRepository.findByScheduledTimeLessThanEqualAndStatusEquals(nowMinusOneHour, OrderStatus.SCHEDULED);
+        // print scheduled orders
+        System.out.println("Scheduled orders: " + scheduledOrders);
+
+
+        for (Order order : scheduledOrders) {
+            try {
+                // check if there are more than 3 active orders
+                long activeOrders = orderRepository.countByStatusInAndActiveTrue(
+                        Arrays.asList(OrderStatus.PREPARING, OrderStatus.IN_DELIVERY)
+                );
+
+                if (activeOrders >= 3) {
+                    saveError(order, "Maximum concurrent orders limit reached (3)");
+                    continue;
+                }
+
+                order.setStatus(OrderStatus.ORDERED);
+                orderRepository.save(order);
+            } catch (Exception e) {
+                saveError(order, e.getMessage());
+            }
+        }
+
+        List<Order> activeOrders = orderRepository.findByStatusInAndActiveTrue(
+                Arrays.asList(OrderStatus.PREPARING, OrderStatus.IN_DELIVERY)
+        );
+        if (activeOrders.size() > 3) {
+            System.out.println("Active orders count: " + activeOrders.size());
+            // get order with most recent created at and cancel it
+            // .min -> returns the smallest element based on the comparator
+            Order orderToCancel = activeOrders.stream().min((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()))
+                    .orElseThrow(() -> new RuntimeException("No active orders found"));
+            // now cancel that order, make active false and status canceled, and call saveError with it
+            orderToCancel.setActive(false);
+            orderToCancel.setStatus(OrderStatus.CANCELED);
+            orderRepository.save(orderToCancel);
+            saveError(orderToCancel, "Maximum concurrent orders limit reached (3)");
+        }
+
+    }
+
+    private void saveError(Order order, String message) {
+        ErrorMessage error = new ErrorMessage();
+        error.setDate(LocalDateTime.now());
+        error.setOperation("SCHEDULE");
+        error.setMessage(message);
+        error.setOrder(order);
+        errorMessageRepository.save(error);
     }
 }

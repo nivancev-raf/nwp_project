@@ -39,7 +39,7 @@ public class Order {
     @Column
     private LocalDateTime createdAt; // vreme kada je kreiran order
 
-    @Column(nullable = false)
+    @Column
     private LocalDateTime lastStatusChange; // vreme kada je poslednji put promenjen status ordera
 
 

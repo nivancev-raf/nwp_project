@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Order } from '../models/order';
 import { Dish } from '../models/dish';
+import { ScheduleOrderRequest } from '../models/schedule-order-request';
 
 @Injectable({
   providedIn: 'root'
@@ -51,7 +52,7 @@ export class OrderService {
         { headers }
       ).toPromise();
       
-      return response!;
+      return response!; // ! je dodato da se izbegne greška ako response bude null (odlazi u catch blok)
     } catch (error) {
       console.error('Error creating order:', error);
       throw error;
@@ -76,31 +77,25 @@ export class OrderService {
     }
   }
 
+  async scheduleOrder(request: ScheduleOrderRequest): Promise<Order> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.authService.getToken()}`
+    });
+   
+    try {
+       const response = await this.http.post<Order>(
+        `${this.API_URL}/api/orders/schedule`,
+        request,
+        { headers }
+      ).toPromise();
+      console.log(response);
+      return response!;
+    } catch (error) {
+      console.error('Error scheduling order:', error);
+      throw error;
+    }
+   }
 
-  // async searchOrders(params: any): Promise<Order[]> {
-  //   const headers = new HttpHeaders({
-  //     'Authorization': `Bearer ${this.authService.getToken()}`
-  //   });
-  
-  //   console.log(params);
-  //   const queryParams = new HttpParams()
-  //     .set('status', params.status.join(','))
-  //     .set('dateFrom', params.dateFrom ? params.dateFrom : '')
-  //     .set('dateTo', params.dateTo ? params.dateTo : '')
-  //     .set('userId', params.userId?.toString() || '');
-  
-  //   try {
-  //     const response = await this.http.get<Order[]>(
-  //       `${this.API_URL}/api/orders`,
-  //       { headers, params: queryParams }
-  //     ).toPromise();
-      
-  //     return response || [];
-  //   } catch (error) {
-  //     console.error('Error searching orders:', error);
-  //     return [];
-  //   }
-  // }
 
   async searchOrders(params: any): Promise<Order[]> {
     const headers = new HttpHeaders({

@@ -21,6 +21,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByCreatedById(Long userId);
     List<Order> findByCreatedAtBetween(LocalDateTime from, LocalDateTime to);
     List<Order> findByStatusInAndCreatedById(List<OrderStatus> statuses, Long userId);
+    List<Order> findByStatusInAndActiveTrue(List<OrderStatus> statuses);
     List<Order> findByStatusInAndCreatedAtBetween(List<OrderStatus> statuses, LocalDateTime from, LocalDateTime to);
     List<Order> findByCreatedAtBetweenAndCreatedById(LocalDateTime from, LocalDateTime to, Long userId);
     List<Order> findByStatusInAndCreatedAtBetweenAndCreatedById(
@@ -29,4 +30,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             LocalDateTime to,
             Long userId
     );
+    List<Order> findByScheduledTimeLessThanEqualAndStatusIsNull(LocalDateTime now);
+    // findByScheduledTimeGreaterThanEqualAndStatusIsNull
+    List<Order> findByScheduledTimeGreaterThanEqualAndStatusIsNull(LocalDateTime now);
+    // findByScheduledTimeGreaterThanEqualAndStatusEquals
+    List<Order> findByScheduledTimeGreaterThanEqualAndStatusEquals(LocalDateTime now, OrderStatus status);
+    // findByScheduledTimeLessThanEqualAndStatusEquals
+    List<Order> findByScheduledTimeLessThanEqualAndStatusEquals(LocalDateTime now, OrderStatus status);
 }

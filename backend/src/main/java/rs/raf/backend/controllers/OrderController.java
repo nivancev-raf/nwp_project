@@ -31,32 +31,6 @@ public class OrderController {
     }
 
 
-//    @PreAuthorize("hasAuthority('can_place_order')")
-//    @PostMapping
-//    public Order placeOrder(@RequestBody CreateOrderRequest order) {
-//        try {
-//            String username = SecurityContextHolder.getContext().getAuthentication().getName();
-//            return orderService.placeOrder(order, userService.findByEmail(username));
-//        } catch (Exception e) {
-//            throw new ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, e.getMessage());
-//        }
-//    }
-
-
-//    @GetMapping
-//    @PreAuthorize("hasAuthority('can_search_order')")
-//    public List<Order> searchOrders(
-//            @RequestParam(required = false) List<String> status,
-//            @RequestParam(required = false) String dateFrom,
-//            @RequestParam(required = false) String dateTo,
-//            @RequestParam(required = false) Long userId) {
-//
-//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-//        User currentUser = userService.findByEmail(username);
-//
-//        return orderService.search(status, dateFrom, dateTo, userId, currentUser);
-//    }
-
     @GetMapping
     @PreAuthorize("hasAuthority('can_search_order')")
     public List<Order> searchOrders(
@@ -86,6 +60,14 @@ public class OrderController {
     @GetMapping("/track/{id}")
     public Order trackOrder(@PathVariable Long id) {
         return orderService.trackOrder(id);
+    }
+
+    @PreAuthorize("hasAuthority('can_schedule_order')")
+    @PostMapping("/schedule")
+    public Order scheduleOrder(@RequestBody CreateOrderRequest request) {
+        System.out.println("Scheduling order req (scheduleTime)" + request.getScheduledTime());
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return orderService.scheduleOrder(request, userService.findByEmail(username));
     }
 
     @PreAuthorize("hasAuthority('can_cancel_order')")

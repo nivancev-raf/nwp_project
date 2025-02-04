@@ -30,7 +30,7 @@ export class OrderListComponent implements OnInit {
     private authService: AuthService
   ) {}
  
-  async ngOnInit() {
+  async ngOnInit() { // ngOnInit() se poziva kada se komponenta inicijalizuje, tj. kada se prikaže na ekranu
     await this.loadOrders();
     const userId = localStorage.getItem('userId');
     this.userPermissions = await this.authService.getUserPermissions(Number(userId));

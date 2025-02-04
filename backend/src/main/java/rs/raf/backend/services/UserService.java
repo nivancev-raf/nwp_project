@@ -46,7 +46,7 @@ public class UserService implements UserDetailsService {
                 .map(SimpleGrantedAuthority::new)
                 .toList();
 
-        System.out.println("permissions1: " + permissions);
+//        System.out.println("permissions1: " + permissions);
         return org.springframework.security.core.userdetails.User.withUsername(myUser.getEmail())
                 .password(myUser.getPassword())
                 .authorities(permissions)

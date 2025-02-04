@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 public class CreateOrderRequest {
     private List<Long> dishes;
+    private LocalDateTime scheduledTime;
 
 
     public List<Long> getDishes() {
@@ -18,5 +19,13 @@ public class CreateOrderRequest {
 
     public void setDishes(List<Long> dishes) {
         this.dishes = dishes;
+    }
+
+    public LocalDateTime getScheduledTime() {
+        return scheduledTime;
+    }
+
+    public void setScheduledTime(LocalDateTime scheduledTime) {
+        this.scheduledTime = scheduledTime;
     }
 }
