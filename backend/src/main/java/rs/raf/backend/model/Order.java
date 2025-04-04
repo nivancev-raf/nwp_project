@@ -42,6 +42,29 @@ public class Order {
     @Column
     private LocalDateTime lastStatusChange; // vreme kada je poslednji put promenjen status ordera
 
+    @Version
+    @Column(name = "version")
+    private Long version;
+
+/*
+OPTIMISTIC LOCK:
+// Optimistic lock je mehanizam koji se koristi da bi se izbegli konflikti prilikom
+// istovremenog pristupa podacima od strane više korisnika.
+// U ovom slučaju, koristimo @Version anotaciju da bismo obezbedili da se verzija
+// entiteta automatski povećava svaki put kada se entitet sačuva.
+
+// Version = 0
+val order = orderRepository.findById(1).get()
+
+// Neko drugi u međuvremenu menja isti order
+val order2 = orderRepository.findById(1).get()
+order2.status = OrderStatus.CANCELED
+orderRepository.save(order2)  // Version = 1
+
+// Pokušaj da se sačuva prva verzija će fail-ovati
+order.status = OrderStatus.DELIVERED
+orderRepository.save(order)  // Throws OptimisticLockException jer je version već 1
+ */
 
 
 

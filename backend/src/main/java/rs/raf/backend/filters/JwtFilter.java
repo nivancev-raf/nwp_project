@@ -29,6 +29,7 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
 
+    // this will be called for every request, before it reaches the controller
     @Override
     protected void doFilterInternal(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, jakarta.servlet.FilterChain filterChain) throws IOException, ServletException {
         String authHeader = request.getHeader("Authorization");

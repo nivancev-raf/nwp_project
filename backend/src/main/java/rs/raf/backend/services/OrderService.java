@@ -109,6 +109,7 @@ public class OrderService {
             System.out.println("pravim error message");
             ErrorMessage errorMessage = new ErrorMessage();
             errorMessage.setDate(LocalDateTime.now());
+            createdOrder.setStatus(OrderStatus.CANCELED);
             errorMessage.setOrder(createdOrder);
             errorMessage.setOperation("PLACE_ORDER");
             errorMessage.setMessage("Maximum number of concurrent orders (3) reached");
@@ -135,7 +136,6 @@ public class OrderService {
     }
 
     public Order scheduleOrder(CreateOrderRequest request, User user) {
-        // TODO: Implementirati zakazivanje porudžbine
         Order order = new Order();
         order.setCreatedBy(user);
         order.setDishes(dishRepository.findAllById(request.getDishes()));
@@ -153,11 +153,10 @@ public class OrderService {
     public void processScheduledOrders() {
 
         // fetches all orders that are scheduled for now or before now, status is null (not ordered)
-        LocalDateTime nowMinusOneHour = LocalDateTime.now().minusHours(1);
-        System.out.println("Now minus one hour: " + nowMinusOneHour);
-        List<Order> scheduledOrders = orderRepository.findByScheduledTimeLessThanEqualAndStatusEquals(nowMinusOneHour, OrderStatus.SCHEDULED);
+        LocalDateTime nowMinusTwoHours = LocalDateTime.now().minusHours(2);
+        List<Order> scheduledOrders = orderRepository.findByScheduledTimeLessThanEqualAndStatusEquals(nowMinusTwoHours, OrderStatus.SCHEDULED);
         // print scheduled orders
-        System.out.println("Scheduled orders: " + scheduledOrders);
+//        System.out.println("Scheduled orders: " + scheduledOrders);
 
 
         for (Order order : scheduledOrders) {

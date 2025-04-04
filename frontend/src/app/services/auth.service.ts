@@ -22,7 +22,7 @@ export class AuthService {
 
   tokenExists(): boolean {
     if (typeof localStorage === 'undefined') {
-      console.log('localStorage is not available');
+      // console.log('localStorage is not available');
       return false;
     }
     return !!localStorage.getItem('token'); // !! converts to boolean, null -> false, string -> true
